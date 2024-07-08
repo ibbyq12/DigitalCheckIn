@@ -3,6 +3,8 @@ A conceptual prototype for a digital check-in system that is tailored to the Uni
 
 This application eliminates difficulty in the situation of a university student needing assistance from a support staff member.
 
+Real-time status updates for support staff
+
 It allows meetings to be arranged and students to ask questions whilst receiving the response to their email.
 
 This application uses packages such as Socket.io, Flask, Flask-SQLAlchemy + SQLite DB, Flask-Session.
