@@ -19,8 +19,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable SQLAlchemy event
 app.config['MAIL_SERVER'] = 'smtp-relay.brevo.com'  # Replace with your SMTP server address
 app.config['MAIL_PORT'] = 587  # Replace with your SMTP server port (usually 587 for TLS)
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'ibbyzabsulution@gmail.com'  # Replace with your SMTP username
-app.config['MAIL_PASSWORD'] = 'xUvKVWp2zf0mbc7G'  # Replace with your SMTP password
+app.config['MAIL_USERNAME'] = ''  # Replace with your SMTP username
+app.config['MAIL_PASSWORD'] = ''  # Replace with your SMTP password
 
 # Secret key for session management
 app.secret_key = 'your_secret_key_here'
