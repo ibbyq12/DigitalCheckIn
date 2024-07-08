@@ -20,3 +20,11 @@ Run 'app.py' which will start the Flask server.
 Input your SMTP info within 'app.py' so that Flask-Mail can work. You can register for free smtp services.
 
 The SQLite DB is created within the 'instance' folder when the server is started for the first time.
+
+## Screenshots
+![pic6](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/286c81fb-9f27-4771-a9e6-139c99e6421a)
+![pic5](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/b5a175b3-72d9-4127-8a76-da8138018169)
+![pic4](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/36ef295e-9315-499c-bbfb-a9b5699fb6cf)
+![pic3](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/ceeae3c0-c556-417d-8847-ebb49411efb5)
+![pic2](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/b8bc7fe3-951d-43cf-bc13-485ab809f01d)
+![pic1](https://github.com/ibbyq12/DigitalCheckIn/assets/100475296/33d8693d-f5cc-4bd5-a990-f905e123be85)
