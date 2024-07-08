@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Requested</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto mt-10 flex justify-center">
+        <div id="meeting-status" class="max-w-lg bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-4">
+                <h1 id="meeting-header" class="text-xl font-bold mb-2">Meeting Requested</h1>
+                <p id="meeting-message" class="text-gray-700 mb-4">Meeting request is pending... Please wait on this page or view the status of your meeting on your menu.</p>
+                <button id="back-to-menu" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO Client Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://127.0.0.1:5000');
+
+
+        // Socket.IO event listener for meeting status updates
+        socket.on('meeting_status_update', function(data) {
+            console.log("Meeting status update received:", data);
+            if (data.student_name === '{{ student_name }}') {
+                updateMeetingStatus(data);
+            }
+        });
+
+        // Function to update the meeting status message
+        function updateMeetingStatus(data) {
+            var meetingHeader = document.getElementById('meeting-header');
+            var meetingMessage = document.getElementById('meeting-message');
+            var backToMenuBtn = document.getElementById('back-to-menu');
+            
+            if (data.status === 'Accepted') {
+                meetingHeader.textContent = "Meeting Accepted";
+                meetingMessage.textContent = "Your meeting request has been accepted. Please wait outside the staff space for the staff member's arrival.";
+            } else if (data.status === 'Declined') {
+                meetingHeader.textContent = "Meeting Declined";
+                meetingMessage.textContent = "The staff member is currently unavailable to accept your request. Please try another staff member or try again later.";
+            }
+
+        }
+
+        // Event listener for back to menu button
+        var backToMenuBtn = document.getElementById('back-to-menu');
+        backToMenuBtn.addEventListener('click', function() {
+            window.location.href = "{{ url_for('menu', student_name=session['student_name']) }}";
+        });
+    </script>
+</body>
+</html>

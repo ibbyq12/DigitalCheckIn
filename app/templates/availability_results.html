@@ -1,0 +1,41 @@
+<!-- availability_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Availability Results</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h3 class="text-2xl font-semibold text-center mb-6">Available Staff Members</h3>
+        <div class="max-w-md mx-auto">
+            <ul class="space-y-2">
+                {% if available_staff %}
+                {% for staff in available_staff %}
+                <li class="bg-white shadow-md rounded py-2 px-4 flex justify-between items-center">
+                    <div>
+                        <span>{{ staff.name }} - {{ staff.staff_space }}</span>
+                    </div>
+                    <div>
+                        <form method="post" action="{{ url_for('request_meeting') }}">
+                            <input type="hidden" name="selected_staff" value="{{ staff.name }}">
+                            <input type="hidden" name="department" value="{{ department}}">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Book Meeting</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+                {% else %}
+                <li class="bg-white shadow-md rounded py-2 px-4">No available staff members found.</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

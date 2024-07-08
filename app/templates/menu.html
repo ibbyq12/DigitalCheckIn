@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex justify-between items-center">
+                <span class="text-gray-600">
+                    Student Number: {{ session['student_number'] }} | Name: {{ session['student_name'] }}
+                </span>
+                <a href="{{ url_for('logout') }}"
+                    class="text-red-600 hover:text-red-800 font-semibold">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-grow container mx-auto px-4 py-8">
+        <div class="max-w-xl mx-auto bg-white shadow-md rounded-lg overflow-hidden mb-8">
+            <div class="p-6">
+                <h3 class="text-2xl font-semibold text-center mb-4">Main Menu</h3>
+                <ul class="divide-y divide-gray-200">
+                    <li class="py-4">
+                        <a href="{{ url_for('request_meeting') }}"
+                            class="block text-blue-600 hover:text-blue-800 font-semibold">Request a Meeting</a>
+                    </li>
+                    <li class="py-4">
+                        <a href="{{ url_for('ask_question') }}"
+                            class="block text-blue-600 hover:text-blue-800 font-semibold">Ask a Question</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="text-lg font-semibold mb-2 text-center mb-2">Your Meetings Today</h2>
+        <div id="meetings-today" class="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <ul id="meetings-today-list" class="divide-y divide-gray-200">
+                    {% for meeting in meetings_today %}
+                    <li class="py-4 flex">
+                        <div class="ml-2">
+                            <p class="text-sm font-medium text-gray-900">Staff Member: {{ meeting.staff_name }}</p>
+                            <p class="text-sm text-gray-500">Staff Space: {{ meeting.staff_space }}</p>
+                            <p class="text-sm text-gray-500">Status: {{ meeting.status }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto">
+        <div class="relative inline-block mx-auto py-20">
+            <button id="tab-unanswered" class="flex items-center justify-center relative focus:outline-none py-2 px-4 bg-white rounded-lg shadow-md">
+                <span class="text-lg">Answered Questions</span>
+                {% if questionCount > 0 %}
+                <span class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">{{ questionCount }}</span>
+                {% endif %}
+            </button>
+            <div id="tab-unanswered-content" class="hidden absolute bg-white rounded-lg shadow-md p-6 mt-2 w-64">
+                <h2 class="text-lg font-semibold mb-4">Answered Questions</h2>
+                <ul>
+                    {% for question in answered_questions %}
+                    <li class="mb-2">
+                        <a href="{{ url_for('view_response', question_id=question.id) }}" class="text-blue-600 hover:underline">
+                            <p class="font-semibold mb-2">Response from {{ question.answered_by }} submitted at {{ question.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}.</p>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tailwind responsive classes for tablets and iPads -->
+    
+    <!-- Your HTML content -->
+    <!-- HTML structure for the notification box -->
+    <div id="notification-box" class="notification hidden fixed bottom-0 right-0 m-4 max-w-sm">
+        <div class="bg-blue-500 text-white rounded-md py-2 px-4">
+            <p id="notification-message"></p>
+            <button id="close-notification" class="ml-2 focus:outline-none">&times;</button>
+        </div>
+    </div>
+    
+
+    <!-- Add SocketIO client script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://127.0.0.1:5000');
+
+        // Check if there's a notification in the local storage
+        var storedNotification = localStorage.getItem('meeting_notification');
+        if (storedNotification) {
+            // Display the stored notification
+            var notificationContainer = document.getElementById('notification-box');
+            var notificationMessage = document.getElementById('notification-message');
+            notificationMessage.innerText = storedNotification;
+            notificationContainer.classList.remove('hidden');
+        }
+
+        // Close the notification when the close button is clicked
+        document.getElementById('close-notification').addEventListener('click', function() {
+            var notificationContainer = document.getElementById('notification-box');
+            notificationContainer.classList.add('hidden');
+
+            // Clear the notification from local storage
+            localStorage.removeItem('meeting_notification');
+        });
+
+        socket.on('meeting_booked', function(data) {
+            console.log("Meeting booked event received:", data); // Check if the event is received and data is correct
+            // Display the notification on the student menu page
+            var notificationContainer = document.getElementById('notification-box');
+            var notificationMessage = document.getElementById('notification-message');
+            notificationMessage.innerText = 'Meeting successfully requested to ' + data.staff_name;
+            notificationContainer.classList.remove('hidden');
+            notificationContainer.classList.add('animate-pulse', 'animate-fade-in', 'z-50', 'transition', 'duration-300', 'ease-out');
+
+            // Store the notification in local storage
+            localStorage.setItem('meeting_notification', 'Meeting successfully requested to ' + data.staff_name);
+
+            setTimeout(function() {
+                notificationContainer.classList.remove('animate-pulse', 'animate-fade-in');
+            }, 3000); // Remove animation classes after 3 seconds
+        });
+
+            // JavaScript to handle tab switching
+        const tabUnanswered = document.getElementById('tab-unanswered');
+        const tabUnansweredContent = document.getElementById('tab-unanswered-content');
+
+        tabUnanswered.addEventListener('click', () => {
+            tabUnansweredContent.classList.toggle('hidden');
+        });
+
+
+    </script>
+
+</body>
+
+</html>

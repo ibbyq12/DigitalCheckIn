@@ -1,0 +1,153 @@
+<!-- Replace your existing staffmenu.html with the following code -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Menu</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-10">
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-2xl font-semibold text-center mb-4">Welcome, {{ staff.name }}</h3>
+                <p class="text-lg text-center text-gray-600 mb-6">Department: {{ department_name}}</p>
+                <p class="text-lg text-center text-gray-600 mb-6">Status: {{ status }}</p>
+                <form method="post" action="{{ url_for('update_status')}}">
+                    <div class="mb-6">
+                        <label for="status" class="block text-sm font-medium text-gray-700">Update Status:</label>
+                        <select id="status" name="status" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="Available" {{ 'selected' if status == 'Available' }}>Available</option>
+                            <option value="Busy" {{ 'selected' if status == 'Busy' }}>Busy</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Update Status</button>
+                </form>
+            </div>
+            <div class="flex justify-center bg-gray-800 py-2">
+                <a href="{{ url_for('logout') }}" class="text-white text-sm font-semibold hover:text-gray-200 px-4 py-2 rounded">Logout</a>
+            </div>
+        </div>
+
+        <div id="notification-container" class="max-w-lg mx-auto mt-4 bg-blue-100 text-blue-800 p-4 rounded">
+            <p class="text-sm font-medium text-gray-900">{{ notification_message }}</p>
+        </div>
+
+    <!-- Pending Meeting Requests Section -->
+    <div id="pending-requests" class="container mx-auto py-10">
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-2xl font-semibold text-center mb-4">Pending Meeting Requests</h3>
+                <ul id="pending-requests-list" class="divide-y divide-gray-200">
+                    {% for request in pending_requests %}
+                    <li class="py-4 flex">
+                        <div class="ml-2">
+                            <p class="text-sm font-medium text-gray-900">{{ request.student_name }}</p>
+                            <p class="text-sm text-gray-500">{{ request.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                        </div>
+                        <div class="ml-auto">
+                            <a href="{{ url_for('respond_request', request_id=request.id, action='accept') }}" class="text-green-600 hover:text-green-900">Accept</a>
+                            <span class="mx-2">|</span>
+                            <a href="{{ url_for('respond_request', request_id=request.id, action='decline') }}" class="text-red-600 hover:text-red-900">Decline</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+<!-- Your Meetings Today Section -->
+    <div id="meetings-today" class="container mx-auto py-10">
+        <div class="max-w-lg mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-2xl font-semibold text-center mb-4">Your Meetings Today</h3>
+                <ul id="meetings-today-list" class="divide-y divide-gray-200">
+                    {% for meeting in meetings_today %}
+                    <li class="py-4 flex">
+                        <div class="ml-2">
+                            <p class="text-sm font-medium text-gray-900">{{ meeting.student_name }}</p>
+                            <p class="text-sm text-gray-500">{{ meeting.staff_space }}</p>
+                        </div>
+                        <div class="ml-auto">
+                            <form method="post" action="{{ url_for('finish_meeting', meeting_id=meeting.id) }}">
+                                <button type="submit" class="text-blue-600 hover:text-blue-800 font-semibold">Finish</button>
+                            </form>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unanswered Questions Tab -->
+    <div class="relative inline-block">
+        <button id="tab-unanswered" class="flex items-center justify-center relative focus:outline-none py-2 px-4 bg-white rounded-lg shadow-md">
+            <span class="text-lg">Unanswered Questions</span>
+            {% if questionCount > 0 %}
+            <span class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">{{ questionCount }}</span>
+            {% endif %}
+        </button>
+        <div id="tab-unanswered-content" class="hidden absolute bg-white rounded-lg shadow-md p-6 mt-2 w-64">
+            <h2 class="text-lg font-semibold mb-4">Unanswered Questions</h2>
+            <ul>
+                {% for question in unanswered_questions %}
+                <li class="mb-2">
+                    <a href="{{ url_for('question_details', question_id=question.id) }}" class="text-blue-600 hover:underline">
+                        Question from {{ student_name }} ({{ question.timestamp.strftime('%Y-%m-%d %H:%M:%S') }})
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Socket.IO Client Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://127.0.0.1:5000');
+
+    // Function to add a new pending request to the list
+    function addPendingRequest(request) {
+        var pendingRequestsList = document.getElementById('pending-requests-list');
+        var listItem = document.createElement('li');
+        listItem.className = 'py-4 flex';
+        var content = `
+            <div class="ml-2">
+                <p class="text-sm font-medium text-gray-900">${request.student_name}</p>
+                <p class="text-sm text-gray-500">${request.created_at}</p>
+            </div>
+            <div class="ml-auto">
+                <a href="/respond_request/${request.id}/accept" class="text-green-600 hover:text-green-900">Accept</a>
+                <span class="mx-2">|</span>
+                <a href="/respond_request/${request.id}/decline" class="text-red-600 hover:text-red-900">Decline</a>
+            </div>
+        `;
+        listItem.innerHTML = content;
+        pendingRequestsList.appendChild(listItem);
+    }
+
+
+    socket.on('new_request', function(data) {
+        console.log("New meeting request received:", data);
+        // Check if the request is for this staff member
+        if (data.staff_name === '{{ staff.name }}') {
+            // Add the new pending request to the list
+            addPendingRequest(data);
+        }
+    });
+
+    // JavaScript to handle tab switching
+    const tabUnanswered = document.getElementById('tab-unanswered');
+        const tabUnansweredContent = document.getElementById('tab-unanswered-content');
+
+        tabUnanswered.addEventListener('click', () => {
+            tabUnansweredContent.classList.toggle('hidden');
+        });
+
+    </script>
+</body>
+</html>

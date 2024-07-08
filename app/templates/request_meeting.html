@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Meeting</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h3 class="text-2xl font-semibold text-center mb-6">Request a Meeting</h3>
+        <form method="post" action="/check_availability" class="space-y-4 max-w-md mx-auto">
+            <div>
+                <label for="department" class="block text-gray-700 font-semibold">Department:</label>
+                <select class="form-select w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                    id="department" name="department">
+                    <option value="Student Programme Support">Student Programme Support</option>
+                    <option value="Student Support Advisors">Student Support Advisors</option>
+                    <option value="Timetabling">Timetabling</option>
+                    <option value="Faculty Staff">Faculty Staff</option>
+                    <option value="Student Experience">Student Experience</option>
+                    <option value="Professional Placement Officers">Professional Placement Officers</option>
+                    <option value="Apprenticeship Coordinators">Apprenticeship Coordinators</option>
+                </select>
+            </div>
+            <div>
+                <label for="staff_space" class="block text-gray-700 font-semibold">Staff Space:</label>
+                <select class="form-select w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                    id="staff_space" name="staff_space">
+                    <option value="Z Block">Z Block</option>
+                    <option value="S Block">S Block</option>
+                    <option value="X Block">X Block</option>
+                    <option value="Q Block - 2Q56">Q Block - 2Q56</option>
+                    <option value="Q Block - 2Q18">Q Block - 2Q18</option>
+                    <option value="A Block">A Block</option>
+                </select>
+            </div>
+            <button type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                Check Availability
+            </button>
+        </form>
+    </div>
+</body>
+
+</html>
