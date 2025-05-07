@@ -1,5 +1,4 @@
-# Digital Check-In
-A conceptual prototype for a digital check-in system that is tailored to the University of the West of England.
+A prototype for a digital check-in system that is tailored to the University of the West of England.
 
 This application eliminates difficulty in the situation of a university student needing assistance from a support staff member.
 
