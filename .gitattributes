@@ -1,0 +1,5 @@
+# Reduce Python detection
+*.py linguist-detectable=false
+# Or mark as documentation/vendor code
+data/* linguist-documentation
+venv/* linguist-vendored
